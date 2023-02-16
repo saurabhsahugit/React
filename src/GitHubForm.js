@@ -1,6 +1,9 @@
-import { Component } from 'react/cjs/react.production.min'
 import './styles.css';
 import axios from 'axios';
+import {React, Component} from 'react';
+
+
+// GitHub usernames: gaearon, sophiebits, sebmarkbage, bvaughn
 
 const testData = [
   {
@@ -23,26 +26,25 @@ const testData = [
 class UsernameInputForm extends Component {
   state = { userName: '' };
 
-  handleSubmit = async (e) => {
-    console.log(this.state.userName);
-    const resp = await axios.get('https://api.github.com/users');
-    const data = await resp.json()
-    console.log(data);
+  handleSubmit = async (event) => {
+    const resp = await axios.get(`https://api.github.com/users/${this.state.userName}`);
+    const data = resp;
+    this.props.onSubmit(data);
   }
-  
+
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
         <input placeholder='Github username...' required
-          onChange={(e) => this.setState({ userName: e.target.value })}>
+          value={this.state.userName}
+          onChange={event => this.setState({ userName: event.target.value })}>
         </input>
         <button>Add card</button>
       </form>
 
-    )
+    );
   }
 }
-// /${this.state.userName}`
 
 
 class Card extends Component {
@@ -59,21 +61,10 @@ class Card extends Component {
   }
 }
 
-// const fetchData = async () => {
-//   const resp = await fetch('https://api.github.com/users')
-//   const data = await resp.json()
-//   console.log(data);
-// }
-// const DiplayUserList = (props) => (
-//   <div>
-//     {props.profiles.map(profile => <Card key={profile.id}{...profile} />)}
-//   </div>
-// );
-
 const DiplayUserList = (props) => (
-	<div>
-  	{props.profiles.map(profile => <Card key={profile.id} {...profile}/>)}
-	</div>
+  <div>
+    {props.profiles.map(profile => <Card key={profile.id} {...profile} />)}
+  </div>
 );
 
 export default class GitHubForm extends Component {
@@ -81,6 +72,11 @@ export default class GitHubForm extends Component {
   state = {
     profiles: testData,
   };
+  addNewProfile = (profileData) => {
+    this.setState(prevState => ({
+      profiles: [...prevState.profiles, profileData],
+    }))
+  }
 
   render() {
     return (<>
